@@ -13,7 +13,7 @@ COPY Cargo.toml ./
 
 COPY src/ ./src/
 
-RUN cargo build --release
+RUN cargo build --release --bin hng_stage_0
 
 FROM gcr.io/distroless/cc-debian12
 
