@@ -4,7 +4,7 @@ use anyhow::{anyhow, Ok, Result};
 use dotenvy::dotenv;
 use hng_stage_0::{
     api::{build_app, AppContext},
-    config::GlobalConfig,
+    config::GlobalConfig, utils::RateLimiter,
 };
 use tokio::net::TcpListener;
 
@@ -19,10 +19,13 @@ async fn main() -> Result<()> {
         anyhow!("Configuration error")
     })?;
 
+    let rate_limiter = RateLimiter::new(20);
+
     let addr = format!("{}:{}", config.host, config.port);
 
     let context = AppContext {
         config: config.clone(),
+        rate_limiter: rate_limiter.clone(),
     };
 
     let app = build_app(context).await;

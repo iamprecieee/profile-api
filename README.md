@@ -7,6 +7,7 @@ A simple REST API built with Rust and Axum that serves user profile information 
 - RESTful API endpoint for fetching user profiles
 - Integration with external cat facts API
 - CORS support for cross-origin requests
+- IP-based rate limiting (20 requests per minute per IP)
 - Swagger UI documentation
 - Comprehensive error handling with fallback mechanisms
 - Full test coverage with mock server integration
@@ -26,6 +27,7 @@ This project uses the following Rust crates:
 - **anyhow** - Error handling
 - **tracing** and **tracing-subscriber** - Logging implementation
 - **wiremock** - HTTP mocking for tests
+- **dashmap** - Concurrent hash map for rate limiting
 
 ## Prerequisites
 
@@ -118,6 +120,7 @@ Returns user profile information along with a random cat fact.
 
 **Status Codes:**
 - 200 OK - Request successful
+- 429 Too Many Requests - Rate limit exceeded (20 requests per minute)
 
 ### Interactive Documentation
 
@@ -146,6 +149,14 @@ The application implements robust error handling:
 - Configuration errors are logged with appropriate error messages
 - Server startup errors are caught and reported
 - All errors avoid exposing sensitive internal details
+
+## Rate Limiting
+The API implements IP-based rate limiting to prevent abuse:
+
+- Limit: 20 requests per minute per IP address
+- Response: HTTP 429 (Too Many Requests) when limit exceeded
+- Window: 60-second sliding window that resets automatically
+- Tracking: Uses in-memory tracking via DashMap for thread-safe concurrent access
 
 ## Development
 
